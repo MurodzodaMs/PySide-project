@@ -9,17 +9,9 @@ class lessonController:
         self.window = window
         self.window.add_block_button.clicked.connect(self.to_add_block)
         self.window.delete_button.clicked.connect(self.delete_lesson)
-        # self.window.show_blocks(self.blocks)
-        # self.window.back_button.clicked.connect()
 
     def lesson_page_by_id(self, lesson_id: int):
         table = read_blocks_by_lesson(lesson_id)
-        # ans = []
-        # for i in table:
-        #     # i: (id, type, comment, media_url, url, lesson_id)
-        #     s = f'{i[0]}. "{i[1]}": {i[2]}'
-        #     ans.append(s)
-        # self.window.show_blocks(ans)
         self.window.show_blocks(table)
 
     def to_add_block(self):
