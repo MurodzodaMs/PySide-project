@@ -15,6 +15,7 @@ class MainWindow(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.title)
+        main_layout.addSpacing(15)
         main_layout.addLayout(buttons)
         main_layout.addStretch()
 

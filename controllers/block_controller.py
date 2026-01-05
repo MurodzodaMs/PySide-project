@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMessageBox, QFileDialog
-from db import create_block
+from db import create_block, update_block
 from ui.block_create_page import BlockWindow
 import shutil
 import os
@@ -50,18 +50,27 @@ class BlockController:
         url = self.view.url_line.text()
         lesson_id = self.view.lesson_id
 
-        create_block(
-            block_type=block_type,
-            comment=comment,
-            media_url=media,
-            url=url,
-            lesson=lesson_id
-        )
-        QMessageBox.information(self.view, 'Success',
-                                'Block was added successfully'
-                                )
+        if self.view.block_id:
+            update_block(
+                block_id=self.view.block_id,
+                block_type=block_type,
+                comment=comment,
+                media_url=media,
+                url=url
+            )
+            QMessageBox.information(self.view, 'Success',
+                                    'Block was updated successfully'
+                                    )
+        else:
+            create_block(
+                block_type=block_type,
+                comment=comment,
+                media_url=media,
+                url=url,
+                lesson=lesson_id
+            )
+            QMessageBox.information(self.view, 'Success',
+                                    'Block was added successfully'
+                                    )
 
-
-        self.view.comment_line.clear()
-        self.view.media_line.clear()
-        self.view.url_line.clear()
+        self.view.clear_data()

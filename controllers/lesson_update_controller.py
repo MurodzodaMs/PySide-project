@@ -1,16 +1,14 @@
-from ui.lesson_page import LessonWindow
+from ui.lesson_update_page import LessonUpdateWindow
 from PySide6.QtWidgets import QMessageBox
 from db import *
 
 
-
-class lessonController:
-    def __init__(self, window: LessonWindow):
+class lessonUpdateController:
+    def __init__(self, window: LessonUpdateWindow):
         self.window = window
-        self.window.add_block_button.clicked.connect(self.to_add_block)
-        self.window.delete_button.clicked.connect(self.delete_lesson)
-        self.window.update_button.clicked.connect(self.update_lesson)
-
+        self.window.delete_block_signal.connect(
+            self.delete_block_cont
+        )
 
     def lesson_page_by_id(self, lesson_id: int):
         table = read_blocks_by_lesson(lesson_id)
@@ -29,9 +27,12 @@ class lessonController:
         delete_lesson(lesson_id)
         self.window.send_delete_lesson_signal()
         QMessageBox.information(self.window, 'Success',
-            'Lesson was deleted successfully'
-        )
+                                'Lesson was deleted successfully'
+                                )
 
-    def update_lesson(self):
-        self.window.send_update_lesson_signal()
-        
+    def delete_block_cont(self, block_id):
+        delete_block(block_id)
+        self.lesson_page_by_id(self.window.lesson_id)
+        QMessageBox.information(self.window, 'success',
+                                'Block was deleted successfully'
+                                )

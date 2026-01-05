@@ -86,6 +86,26 @@ def read_blocks_by_lesson(lesson_id):
     return db.fetchall('SELECT * FROM blocks WHERE lesson=?', (lesson_id,))
 
 
+def delete_block(block_id):
+    db.commit('DELETE FROM blocks WHERE id = ?', (block_id,))
+
+
+def get_block_by_id(block_id):
+    return db.fetchone('SELECT * FROM blocks WHERE id = ?', (block_id,))
+
+
+def update_block(block_id, block_type, **kwargs):
+    comment = kwargs.get('comment')
+    media_url = kwargs.get('media_url')
+    url = kwargs.get('url')
+
+    db.commit('''
+        UPDATE blocks 
+        SET type=?, comment=?, media_url=?, url=?
+        WHERE id=?
+    ''', (block_type, comment, media_url, url, block_id))
+
+
 def check_lesson(title):
     lesson = db.fetchone('select * from lessons where title=?', (title,))
     return bool(lesson)

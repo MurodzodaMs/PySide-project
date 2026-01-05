@@ -3,3 +3,6 @@ local.db
 s.css
 h.html
 media
+dist
+build
+main.spec

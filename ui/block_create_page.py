@@ -14,6 +14,9 @@ class BlockWindow(QWidget):
         self.media_label = QLabel('Media')
         self.url_label = QLabel('Url')
 
+        self.block_id = None
+        self.lesson_id = None
+
         self.type_line = QComboBox()
         self.type_line.addItems(
             ['p', 'h1', 'h2', 'h3', 'h4', 'h5',
@@ -87,3 +90,32 @@ class BlockWindow(QWidget):
     def show_default(self):
         self.media_widget.hide()
         self.url_widget.hide()
+
+    def set_block_data(self, block_data):
+        # block_data: (id, type, comment, media_url, url, lesson_id)
+        self.block_id = block_data[0]
+        block_type = block_data[1]
+        comment = block_data[2]
+        media_url = block_data[3]
+        url = block_data[4]
+        self.lesson_id = block_data[5]
+
+        self.type_line.setCurrentText(block_type)
+        self.comment_line.setText(comment)
+        self.media_line.setText(media_url)
+        self.url_line.setText(url)
+
+        if block_type == 'media':
+            self.show_media()
+        elif block_type == 'url':
+            self.show_url()
+        else:
+            self.show_default()
+
+    def clear_data(self):
+        self.block_id = None
+        self.type_line.setCurrentIndex(0)
+        self.comment_line.clear()
+        self.media_line.clear()
+        self.url_line.clear()
+        self.show_default()

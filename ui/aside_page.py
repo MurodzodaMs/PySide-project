@@ -12,6 +12,7 @@ class AsideWindow(QWidget):
 
         self.title = QLabel('<h1>Lessons')
         self.main_layout.addWidget(self.title)
+        self.main_layout.addSpacing(15)
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)

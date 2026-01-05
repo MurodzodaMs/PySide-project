@@ -6,10 +6,11 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Signal, Qt
 
 
-class LessonWindow(QWidget):
+class LessonUpdateWindow(QWidget):
     add_block_signal = Signal(int)
     delete_lesson_signal = Signal()
-    update_lesson_signal = Signal(int)
+    delete_block_signal = Signal(int)
+    update_block_signal = Signal(int)
 
     def __init__(self):
         super().__init__()
@@ -18,10 +19,7 @@ class LessonWindow(QWidget):
 
         self.lesson_id = 0
         self.title = QLabel('<h2>Lesson</h2>')
-        self.add_block_button = QPushButton('Add block')
         self.back_button = QPushButton('Back')
-        self.delete_button = QPushButton('Delete Lesson')
-        self.update_button = QPushButton('Update Lesson')
 
         self.block_list = QScrollArea()
         self.block_list.setWidgetResizable(True)
@@ -31,9 +29,6 @@ class LessonWindow(QWidget):
 
         buttons = QHBoxLayout()
         buttons.addWidget(self.back_button)
-        buttons.addWidget(self.add_block_button)
-        buttons.addWidget(self.update_button)
-        buttons.addWidget(self.delete_button)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.title)
@@ -43,12 +38,8 @@ class LessonWindow(QWidget):
 
         self.setLayout(main_layout)
 
-
     def show_blocks(self, blocks: list):
-        while self.block_layout.count():
-            item = self.block_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()  # type: ignore
+        self.clear_layout(self.block_layout)
 
         for block in blocks:
             s1, s2 = '', ''
@@ -68,6 +59,8 @@ class LessonWindow(QWidget):
                     ready_block.setWordWrap(True)
                     ready_block.setOpenExternalLinks(True)
                     self.block_layout.addWidget(ready_block)
+
+                    self.add_command_buttons(block[0])
                     continue
                 case 'media':
                     pixmap = QPixmap(block[3])
@@ -83,12 +76,47 @@ class LessonWindow(QWidget):
                         caption.setStyleSheet(
                             "color: gray; font-style: italic;")
                         self.block_layout.addWidget(caption)
+
+                    self.add_command_buttons(block[0])
                     continue
                 case _: s1 = '<p>'; s2 = '</p>'
+
             ready_block = QLabel(str(s1+block[2]+s2))
             ready_block.setWordWrap(True)
             self.block_layout.addWidget(ready_block)
+
+            self.add_command_buttons(block[0])
+
         self.block_layout.addStretch()
+
+    def clear_layout(self, layout):
+        while layout.count():
+            item = layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+            elif item.layout():
+                self.clear_layout(item.layout())
+                item.layout().deleteLater()
+
+    def add_command_buttons(self, block_id):
+        buttons_layout = QHBoxLayout()
+
+        update_btn = QPushButton('Update')
+        delete_btn = QPushButton('Delete')
+
+        buttons_layout.addWidget(update_btn)
+        buttons_layout.addWidget(delete_btn)
+        buttons_layout.addStretch()
+
+        delete_btn.clicked.connect(
+            lambda _, x=block_id: self.delete_block_signal.emit(x)
+        )
+        update_btn.clicked.connect(
+            lambda _, x=block_id: self.update_block_signal.emit(x)
+        )
+
+        self.block_layout.addLayout(buttons_layout)
+        self.block_layout.addSpacing(10)
 
     def give_block(self, block):
         pass
@@ -98,7 +126,3 @@ class LessonWindow(QWidget):
 
     def send_delete_lesson_signal(self):
         self.delete_lesson_signal.emit()
-
-    def send_update_lesson_signal(self):
-        lesson_id = self.lesson_id
-        self.update_lesson_signal.emit(lesson_id)
